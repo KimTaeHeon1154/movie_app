@@ -1,3 +1,5 @@
+// 실제 웹페이지에 렌더링하는 파일
+
 import React from 'react';
 import ReactDOM from 'react-dom';
 import App from './App';
