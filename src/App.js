@@ -1,90 +1,38 @@
 import React from 'react';
-import Potato from './Potato';
-import propTypes from 'prop-types';
-// prop-types를 이용해서, 각 컴포넌트마다 제대로 props를 넘겨받았는지 검사 가능!
+import axios from "axios";
+// 외부의 데이터를 가져오기 위한 툴, axios
+import Movie from "./Movie";
+import PropTypes from 'prop-types';
 
-// 하나의 파일에서 컴포넌트를 생성함. + name, fav 같은 props를 설정하고, 그를 컴포넌트에서 이용함!
-function Food({fav, picture, rating}){
-    return (
-        // fav 자체를 arg로 받아서 이용함
-        <div>
-            <h2>I like {fav}</h2>
-            <h4>{rating}/5</h4>
-            <img src={picture} alt={fav}/>
-        </div>
-    );
-}
-// prop-types를 이용해서 food 컴포넌트에서 props를 제대로 넘겨받았는가 검사하는 방법 (만약 해당 기준에 안 맞는 props가 들어가게 되면, console창에 에러가 뜬다)
-Food.propTypes = {
-    fav: PropTypes.string.isRequired,
-    picture: PropTypes.string.isRequired,
-    rating: PropTypes.number
-}
+// state (동적으로 변하는 데이터를 처리하기 위함!)
 
-function Game(props){
-    // props를 arg로 받아서, 그 아래의 name을 이용함
-    return <h2>I love {props.name}, {props.genre}</h2>
-}
 
-// id는 각각을 구분하기 위해서 임의로 지정한 것
-const foodILike = [
-    {
-      id:1,
-      name: "Kimchi",
-      image:
-        "http://aeriskitchen.com/wp-content/uploads/2008/09/kimchi_bokkeumbap_02-.jpg",
-      rating: 5
-    },
-    {
-      id:2,
-      name: "Samgyeopsal",
-      image:
-        "https://3.bp.blogspot.com/-hKwIBxIVcQw/WfsewX3fhJI/AAAAAAAAALk/yHxnxFXcfx4ZKSfHS_RQNKjw3bAC03AnACLcBGAs/s400/DSC07624.jpg",
-        rating: 4.9
-    },
-    {
-      id:3,
-      name: "Bibimbap",
-      image:
-        "http://cdn-image.myrecipes.com/sites/default/files/styles/4_3_horizontal_-_1200x900/public/image/recipes/ck/12/03/bibimbop-ck-x.jpg?itok=RoXlp6Xb",
-        rating: 4.8
-    },
-    {
-      id:4,
-      name: "Doncasu",
-      image:
-        "https://s3-media3.fl.yelpcdn.com/bphoto/7F9eTTQ_yxaWIRytAu5feA/ls.jpg",
-        rating: 4.7
-    },
-    {
-      id:5,
-      name: "Kimbap",
-      image:
-        "http://cdn2.koreanbapsang.com/wp-content/uploads/2012/05/DSC_1238r-e1454170512295.jpg",
-        rating: 4.6
+// React.Component라는 모 클래스로부터 파생된 App 클래스. (React.Component클래스의 인스턴스 모두 사용 가능!)
+class App extends React.Component{
+    state = {
+        // state안의 내용물을 밖에서 가져오려면, this.state.isLoading 이렇게 해야함~
+        isLoading: true,
+        movies: []
+    };
+
+    async componentDidMount(){
+        // axios를 사용해 아래 url에 있는 데이터를 가져온다. (데이터를 온전히 가져올때까지 기다려야 하므로 async, await 쓴다.)
+        const {data: {data : {movies}}} = await axios.get("https://yts-proxy.now.sh/list_movies.json?sort_by=rating");
+        // console.log()해보면, 위 json 파일에서 data.data.movies에 실제 영화 데이터들이 들어잇기 때문에 변수를 저렇게 지정해준다.
+        this.setState({ movies, isLoading: false});
+        // state의 movies array에, json파일의 movies를 넣어준다 + movies 다 옮겨지면 isLoading을 false로 바꾼다.
     }
-  ];
 
-function renderFood(dish){
-    // key부분은 각 element 다르게 보이기 위해 id 지정해준것. (에러 해결하기 위해서 한 것 뿐이다)
-    return <Food key={dish.id} fav={dish.name} picture={dish.image} rating={dish.rating}/>
-}
-
-// 컴포넌트는, html형식의 코드를 return하는 함수!
-function App() {
-    return (
-    <div>
-        Hello!!
-        {/* 이런식으로 컴포넌트를 다른 컴포넌트 안에 넣을 수 있다!! */}
-        <Potato/>
-        {/* 이런 식으로 컴포넌트에 특징(properties, props)를 줄 수 있다. */}
-        <Food fav="kimchi"/>
-        <Food fav="ramen"/>
-        <Game name="LOL" genre="AOS"/>
-        <Game name="Battle Ground" genre="FPS"/>
-        {/* map은 array요소 하나하나당 function을 실행해준다. + Food함수의 내용이 들어오는데, fav에 array요소의 name항목이 들어가게 되는 것 */}
-        {foodILike.map(renderFood)}
-    </div>);
+    // render 메서드 안에서 return으로 웹페이지에 구현한다. / state는 아래와 같은 방식으로 렌더링할 수 있다.
+    render(){
+        const {isLoading, movies} = this.state;
+        return (
+            // 아래 구문은, if (isLoading) {"Loading"} else {movies.map(~~~)}와 같음
+            <div>{isLoading ? "Loading..." : movies.map(arg => {
+                return <Movie key={arg.id} id={arg.id} year={arg.year} title={arg.title} summary={arg.summary} poster={arg.medium_cover_image}/>
+            })}</div>
+        );
+    }
 }
 
 export default App;
