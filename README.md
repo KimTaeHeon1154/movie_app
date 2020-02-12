@@ -15,4 +15,4 @@ React는 html파일에는 텍스트가 안 들어간다. 대신 App.js에서 텍
 ### github page 이용하는 방법
 1.npm install gh-pages  
 2.package.json 파일에 "homepage": "https://(깃헙 이름).github.io/(레포지토리 이름)/" 추가  
-3.package.json 파일의 scripts에 deploy, predeploy 만들기 (build 폴더를 만들게되며, 만들어지면 그 폴더를 기반으로 페이지 생성됨)  
+3.package.json 파일의 scripts에 deploy, predeploy 만들기 (build 폴더를 만들게되며, 만들어지면 그 폴더를 기반으로 페이지 생성됨)  (deploy가 잘 안되면, node_modules->gh-pages->cache 폴더 지우고 다시하면 됨!)
